@@ -1,89 +1,15 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Recettes</title>
-    <script type="module" src="/src/main.js"></script>
-    <link href="/src/css/app.css" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Application de recettes</title>
 </head>
-<body class="bg-gray-100">
-<div id="app" class="min-h-screen flex flex-col">
-    <!-- Barre de navigation -->
-    <nav class="bg-teal-800 text-white py-4 shadow-md" x-data="{ isMenuOpen: false }">
-        <div class="container mx-auto flex justify-between items-center px-6">
-            <h1 class="text-xl font-bold tracking-wide">Recettes de Cuisine</h1>
-
-            <!-- Menu burger -->
-            <button class="lg:hidden text-white" @click="isMenuOpen = !isMenuOpen">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                </svg>
-            </button>
-
-            <!-- Liens de navigation visibles en tout temps -->
-            <div class="hidden lg:flex space-x-6">
-                <a href="#" class="hover:text-teal-200 transition-colors duration-300">Accueil</a>
-                <a href="#" class="hover:text-teal-200 transition-colors duration-300">Recettes</a>
-                <a href="#" class="hover:text-teal-200 transition-colors duration-300">À propos</a>
-            </div>
-        </div>
-
-        <!-- Menu mobile -->
-        <div x-show="isMenuOpen" x-transition class="lg:hidden bg-teal-800 text-white mt-4">
-            <ul class="space-y-4">
-                <li><a href="#" class="block py-2 px-4 text-center">Accueil</a></li>
-                <li><a href="#" class="block py-2 px-4 text-center">Recettes</a></li>
-                <li><a href="#" class="block py-2 px-4 text-center">À propos</a></li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Zone de filtrage -->
-    <div class="container mx-auto py-6" x-data="RecipesFilter" x-init="init()">
-        <label for="difficulty" class="block text-lg font-bold">Filtrer par difficulté</label>
-        <select id="difficulty" x-model="selectedDifficulty" @change="filterByDifficulty" class="mt-2 p-2 border border-gray-300 rounded-lg">
-            <option value="toutes">Toutes</option>
-            <template x-for="difficulty in difficulties" :key="difficulty">
-                <option :value="difficulty" x-text="difficulty"></option>
-            </template>
-        </select>
-    </div>
-
-    <!-- Affichage du nombre total de recettes -->
-    <div class="container mx-auto py-6 text-lg font-semibold">
-        <p>Total de recettes: <span x-text="filteredRecipes.length"></span></p>
-    </div>
-
-    <!-- Grille de recettes -->
-    <main class="container mx-auto py-6" x-data="RecipesFilter" x-init="init()">
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <template x-for="recipe in filteredRecipes" :key="recipe.id">
-                <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
-                    <img :src="recipe.imageUrl" :alt="recipe.title" class="h-32 w-full object-cover">
-                    <div class="p-4">
-                        <h3 class="text-lg font-bold" x-text="recipe.title"></h3>
-                        <p class="text-sm text-gray-600" x-text="`Difficulté: ${recipe.difficulty}`"></p>
-                        <p class="text-sm text-gray-600" x-text="`Temps: ${recipe.preparationTime}`"></p>
-                        <p class="text-sm text-gray-600" x-text="`Catégorie: ${recipe.category}`"></p>
-                        <button
-                                class="text-teal-600 mt-2 inline-block hover:underline"
-                                x-on:click="openModal(recipe)"
-                        >Voir plus</button>
-                    </div>
-                </div>
-            </template>
-        </section>
-    </main>
-
+<body>
+<div id="app">
+    <load src="src/components/header.html" />
+    <load src="src/components/recipes.html" />
 </div>
-
-<script type="module">
-    import RecipesFilter from '/src/js/modules/recipesFilter.js';
-
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('RecipesFilter', RecipesFilter);
-    });
-</script>
+<script type="module" src="/src/main.js"></script>
 </body>
 </html>

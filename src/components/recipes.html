@@ -1,0 +1,177 @@
+<div x-data="RecipesDisplay()" x-init="initialize()" class="mx-5 max-w-7xl mx-auto container">
+    <!-- Section de filtrage -->
+    <div class="my-6">
+        <div class="flex flex-wrap gap-6 items-center">
+            <!-- Filtres -->
+            <div>
+                <h3 class="text-lg font-bold">Filtrer par difficulté</h3>
+                <select
+                        x-model="activeDifficulty"
+                        @change="applyFilters()"
+                        class="px-4 py-2 rounded border bg-white text-gray-700"
+                >
+                    <template x-for="level in difficultyLevels" :key="level">
+                        <option :value="level" x-text="level"></option>
+                    </template>
+                </select>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold">Filtrer par catégorie</h3>
+                <select
+                        x-model="activeCategory"
+                        @change="applyFilters()"
+                        class="px-4 py-2 rounded border bg-white text-gray-700"
+                >
+                    <template x-for="category in categories" :key="category">
+                        <option :value="category" x-text="category"></option>
+                    </template>
+                </select>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold">Filtrer par temps de préparation</h3>
+                <select
+                        x-model="activePreparationTime"
+                        @change="applyFilters()"
+                        class="px-4 py-2 rounded border bg-white text-gray-700"
+                >
+                    <template x-for="time in preparationTimes" :key="time">
+                        <option :value="time" x-text="time"></option>
+                    </template>
+                </select>
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold">Rechercher par titre</h3>
+                <input
+                        type="text"
+                        x-model="searchQuery"
+                        @input.debounce.300ms="applyFilters()"
+                        placeholder="Rechercher..."
+                        class="px-4 py-2 rounded border bg-white text-gray-700"
+                />
+            </div>
+
+            <div>
+                <h3 class="text-lg font-bold">Afficher uniquement les favoris</h3>
+                <input
+                        type="checkbox"
+                        x-model="showFavoritesOnly"
+                        @change="applyFilters()"
+                        class="px-4 py-2 rounded border bg-white text-gray-700"
+                />
+            </div>
+
+
+            <!-- Bouton Réinitialiser -->
+            <div>
+                <button
+                        @click="resetFilters"
+                        class="mt-6 px-4 py-2 bg-gray-200 rounded-md"
+                >
+                    Réinitialiser les filtres
+                </button>
+            </div>
+        </div>
+
+        <!-- Nombre de recettes trouvées -->
+        <div class="mt-4">
+            <p class="text-lg">
+                Nombre de recettes trouvées : <span x-text="filteredList.length"></span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Grille des recettes -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 my-12">
+        <!-- Vérification si la liste est vide -->
+        <template x-if="filteredList.length === 0">
+            <p class="text-center text-gray-500 text-lg col-span-full">Pas de résultats correspondant à votre recherche.</p>
+        </template>
+
+        <!-- Affichage des recettes si la liste n'est pas vide -->
+        <template x-for="item in filteredList" :key="item.id">
+            <article class="flex flex-col bg-white rounded-lg shadow-lg overflow-hidden">
+                <img :src="item.imageUrl" :alt="item.title" class="w-full h-36 object-cover rounded-t-lg" />
+                <div class="flex flex-col justify-between p-4">
+                    <h3 class="text-2xl" x-text="item.title"></h3>
+                    <p class="text-sm text-gray-500" x-text="item.preparationTime + ' min'"></p>
+                    <p class="text-sm text-gray-500" x-text="item.category"></p>
+                    <p class="text-sm text-gray-500" x-text="item.difficulty"></p>
+
+                    <!-- Bouton pour marquer en favori -->
+                    <button
+                            @click="toggleFavorite(item)"
+                            :class="{'bg-yellow-500': isFavorite(item), 'bg-gray-200': !isFavorite(item)}"
+                            class="mt-4 text-white font-bold px-4 py-2 rounded"
+                    >
+                        <span x-text="isFavorite(item) ? 'Retirer des favoris' : 'Ajouter aux favoris'"></span>
+                    </button>
+
+                    <button @click="openRecipeDetail(item)" class="mt-4 text-teal-600 font-bold hover:underline">
+                        Voir détails
+                    </button>
+                </div>
+            </article>
+        </template>
+
+    </div>
+
+
+    <!-- Modale -->
+    <div x-show="isDetailOpen" @click.away="closeRecipeDetail" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
+        <div class="bg-white p-8 rounded-lg max-w-lg w-full my-5">
+            <!-- Image with rounded corners -->
+            <div class="mb-6">
+                <img :src="currentRecipe?.imageUrl" :alt="currentRecipe?.title" class="w-full rounded-lg mb-4" />
+            </div>
+
+            <h2 class="text-2xl font-bold mb-4" x-text="currentRecipe?.title"></h2>
+            <p class="text-lg my-4">Préparation: <span x-text="currentRecipe?.preparationTime || 'Non spécifiée'"></span> minutes</p>
+            <p class="text-lg mb-4">Catégorie: <span x-text="currentRecipe?.category || 'Non spécifiée'"></span></p>
+            <p class="text-lg mb-4">Portions: <span x-text="currentRecipe?.servings || 'Non spécifiées'"></span></p>
+
+            <h3 class="text-lg font-semibold mt-4">Ingrédients</h3>
+            <ul class="list-disc pl-6 mb-4" x-if="currentRecipe?.ingredients && currentRecipe.ingredients.length > 0">
+                <template x-for="ingredient in currentRecipe.ingredients">
+                    <li x-text="ingredient.quantity + ' ' + ingredient.unit + ' ' + ingredient.name"></li>
+                </template>
+            </ul>
+
+            <h3 class="text-lg font-semibold mt-4">Instructions</h3>
+            <div class="mt-4">
+                <template x-for="(instruction, index) in currentRecipe?.instructions" :key="index">
+                    <p x-show="stepIndex === index" class="opacity-100 transition-opacity duration-500">
+                        <span x-text="index + 1"></span>. <span x-text="instruction"></span>
+                    </p>
+                </template>
+
+                <div class="flex justify-between mt-4">
+                    <button
+                            @click="changeStep('prev')"
+                            :disabled="stepIndex === 0"
+                            class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md">
+                        Précédent
+                    </button>
+                    <button
+                            @click="changeStep('next')"
+                            :disabled="stepIndex === (currentRecipe?.instructions?.length || 1) - 1"
+                            class="px-4 py-2 bg-teal-600 text-white rounded-md">
+                        Suivant
+                    </button>
+                </div>
+
+                <!-- Barre de progression -->
+                <div class="w-full bg-gray-200 h-2 rounded-full mt-4">
+                    <div
+                            class="h-2 bg-blue-500 rounded-full transition-all duration-300"
+                            :style="{ width: ((stepIndex + 1) / (currentRecipe?.instructions?.length || 1)) * 100 + '%' }"
+                    ></div>
+                </div>
+            </div>
+
+            <button @click="closeRecipeDetail" class="mt-6 px-4 py-2 bg-gray-200 font-bold rounded-md">Fermer</button>
+        </div>
+    </div>
+</div>

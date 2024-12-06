@@ -1,0 +1,25 @@
+<nav class="bg-teal-800 text-white py-4 shadow-md" x-data="{ isMenuVisible: false }">
+    <div class="container mx-auto flex justify-between items-center px-6">
+        <h1 class="text-xl font-bold tracking-wide">Recettes de Cuisine</h1>
+
+        <button class="lg:hidden text-white" @click="isMenuVisible = !isMenuVisible">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <div class="hidden lg:flex space-x-6">
+            <a href="#" class="">Accueil</a>
+            <a href="#" class="">Recettes</a>
+            <a href="#" class="">À propos</a>
+        </div>
+    </div>
+
+    <div x-show="isMenuVisible" x-transition class="lg:hidden bg-teal-800 text-white mt-4">
+        <ul class="space-y-4">
+            <li><a href="#" class="block py-2 px-4 text-center">Accueil</a></li>
+            <li><a href="#" class="block py-2 px-4 text-center">Recettes</a></li>
+            <li><a href="#" class="block py-2 px-4 text-center">À propos</a></li>
+        </ul>
+    </div>
+</nav>
